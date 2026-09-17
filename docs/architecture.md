@@ -27,7 +27,7 @@ flowchart TD
 
 Synchronous SQLAlchemy/psycopg is sufficient for the initial workload. Future database routes should be synchronous FastAPI handlers or explicitly manage thread execution; do not block the event loop with synchronous database calls inside async handlers. Request sessions close automatically; services will own commits and rollback behavior.
 
-## Planned data relationships (Module 02 onward)
+## Database relationships (Module 02)
 
 ```mermaid
 erDiagram
@@ -36,7 +36,7 @@ erDiagram
   Site ||--o{ SiteMetric : records
 ```
 
-Projects include name, description, type, status, dates, creator and timestamps. Sites include project ownership, metadata and `geometry(Polygon,4326)`. GeoJSON carries boundaries across the API. PostGIS validates geometry and computes area using geography/metre-based calculations; do not compute square metres directly from longitude/latitude degrees. Plan spatial indexes and queries with Module 02/06. SiteMetric stores dated measurements with explicit units and synthetic provenance. Deletion rules, uniqueness constraints and indexes are finalized in Module 02. No business schema exists now.
+The first migration defines User, Project, Site and SiteMetric, with server-generated UUIDs and timezone-aware audit timestamps. Projects have required ownership, name and constrained lifecycle status. Sites store validated `geometry(Polygon,4326)` with a GiST index and generated geodesic area in hectares. Metrics have one sample per site/time. User deletion is restricted while projects exist; project/site deletion cascades to descendants. An opt-in seed supplies clearly labeled synthetic examples. Project type/dates and GeoJSON API contracts remain future-module work. See [database design](module-02-database.md) for constraints, indexes, timestamp triggers and operational commands.
 
 ## Foundation decisions
 
@@ -44,6 +44,7 @@ Projects include name, description, type, status, dates, creator and timestamps.
 - Root `.env`: Compose, backend and Vite share configuration; only VITE-prefixed variables are browser-visible.
 - Docker image `postgis/postgis:17-3.5`: PostgreSQL 17 plus PostGIS, persistent named volume, loopback-only port, healthcheck. The tag is an upstream patch stream, not immutable; record the verified image digest before deployment.
 - Alembic has a working migration environment and GeoAlchemy2 helpers; no revisions or business models are introduced in Module 01.
+- Module 02 adds revision `0001_core_schema`. Model discovery includes the complete model package; migrations restrict their transaction search path to `public` so extension-owned Tiger/Topology tables are not treated as application drift. Unexpected application tables remain detectable. Integration tests apply/reverse migrations only in disposable PostgreSQL databases.
 - `/api/health` reports API liveness independent of PostgreSQL, allowing useful isolated tests.
 - Placeholder routes are public during foundation. JWT auth, password hashing and role/access policy belong to Module 03.
 - Highcharts and Mapbox are installed but unused until their modules. Review their license/usage requirements before public deployment.
