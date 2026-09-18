@@ -1,6 +1,8 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useAuth } from '../features/auth/useAuth'
 
 export function AppShell() {
+  const { user, logout } = useAuth()
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">
@@ -10,7 +12,7 @@ export function AppShell() {
         <LinkBrand />
         <p className="workspace-label">ENVIRONMENTAL INTELLIGENCE</p>
         <nav aria-label="Main navigation">
-          <NavLink to="/" end>
+          <NavLink to="/dashboard" end>
             Dashboard
           </NavLink>
           <NavLink to="/projects">Projects</NavLink>
@@ -24,7 +26,14 @@ export function AppShell() {
       <div className="workspace">
         <header className="topbar">
           <span>Workspace / Darukaa.Earth</span>
-          <span className="badge">Module 01</span>
+          <div className="account-actions">
+            <span className="account-name">
+              {user?.full_name || user?.email}
+            </span>
+            <button className="logout-button" onClick={logout}>
+              Sign out
+            </button>
+          </div>
         </header>
         <main id="main">
           <Outlet />

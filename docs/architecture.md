@@ -46,7 +46,7 @@ The first migration defines User, Project, Site and SiteMetric, with server-gene
 - Alembic has a working migration environment and GeoAlchemy2 helpers; no revisions or business models are introduced in Module 01.
 - Module 02 adds revision `0001_core_schema`. Model discovery includes the complete model package; migrations restrict their transaction search path to `public` so extension-owned Tiger/Topology tables are not treated as application drift. Unexpected application tables remain detectable. Integration tests apply/reverse migrations only in disposable PostgreSQL databases.
 - `/api/health` reports API liveness independent of PostgreSQL, allowing useful isolated tests.
-- Placeholder routes are public during foundation. JWT auth, password hashing and role/access policy belong to Module 03.
+- Module 03 protects the placeholder routes with centralized React auth state, shared Axios Bearer headers and a reusable backend get_current_user dependency. Registration/login/me use schemas → AuthService → UserRepository; Argon2id hashes and expiring JWTs use existing user columns without a migration. Authorization currently requires an active authenticated account; resource ownership rules remain future feature work. See [authentication design](module-03-authentication.md).
 - Highcharts and Mapbox are installed but unused until their modules. Review their license/usage requirements before public deployment.
 
 ## Verification and evolution

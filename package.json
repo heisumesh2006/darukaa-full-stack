@@ -11,9 +11,11 @@
     "lint": "npm run lint --workspace frontend",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:auth": "playwright test --config frontend/playwright.config.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
     "prettier": "^3.6.0"

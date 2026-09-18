@@ -4,7 +4,7 @@ An environmental project management and geospatial analytics platform for admini
 
 ## Current status
 
-Modules 01–02 provide developer tooling, a responsive application shell with placeholder Dashboard, Projects and Map routes, a FastAPI health endpoint, and a migrated PostgreSQL/PostGIS schema with synthetic seed data. Authentication, project/site management APIs/UI, maps, analytics and deployment are **planned, not implemented**. Seed values are synthetic hackathon examples; the inactive demo user has no login credentials.
+Modules 01–03 provide developer tooling, protected placeholder Dashboard/Projects/Map routes, a FastAPI health endpoint, a migrated PostgreSQL/PostGIS schema with synthetic seed data, and JWT authentication. Registration, login, current-user lookup and browser logout are implemented. Project/site management APIs/UI, maps, analytics and deployment remain **planned, not implemented**. Seed values are synthetic hackathon examples; the inactive demo user still has no login credentials.
 
 ## Stack and structure
 
@@ -15,7 +15,7 @@ darukaa-earth/
   frontend/src/       app, components, features, hooks, services, types, utils, styles
   backend/app/        api, core, db, models, schemas, services, repositories, analytics
   backend/alembic/    core schema migration and migration environment
-  backend/tests/     health contract and CORS tests
+  backend/tests/     health, database and authentication tests
   docs/              requirements, architecture, module plan, validation
   scripts/           portable backend hook runner
   .github/workflows/ reserved for Module 11
@@ -57,9 +57,12 @@ DATABASE_URL=postgresql+psycopg://darukaa:<URL-encoded-password>@127.0.0.1:5432/
 VITE_API_BASE_URL=http://localhost:8000/api
 VITE_MAPBOX_TOKEN=
 CORS_ORIGINS=["http://localhost:5173","http://127.0.0.1:5173"]
+JWT_SECRET_KEY=<generated-random-secret-at-least-32-characters>
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
-`.env` is ignored by Git. Never commit credentials. Vite exposes `VITE_*` values to the browser: the later Mapbox integration must use a public, URL-restricted Mapbox token, never a secret token. Leave it empty for Module 01. Backend settings and Vite both read the root `.env`; restart servers after editing. CORS origins use a JSON array. JWT secrets will be introduced in Module 03.
+`.env` is ignored by Git. Never commit credentials. Vite exposes `VITE_*` values to the browser: the later Mapbox integration must use a public, URL-restricted Mapbox token, never a secret token. Leave it empty until Module 05. Backend settings and Vite both read the root `.env`; restart servers after editing. CORS origins use a JSON array. JWT configuration is required for API startup; use a randomly generated signing secret, never a literal placeholder or VITE-prefixed secret. The developer environment is already configured. See [authentication setup and tradeoffs](docs/module-03-authentication.md).
 
 ## PostgreSQL/PostGIS
 
@@ -95,7 +98,7 @@ In another terminal at the repository root:
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173`. Dashboard, Projects and Map explorer are intentionally labeled placeholders. Unknown paths render a 404 page. No login, map tiles, or environmental data are loaded.
+Open `http://127.0.0.1:5173/login` or `/register`. Registration signs you in; `/dashboard`, `/projects` and `/map` remain protected placeholders. Refresh restores the current tab's session through `/api/auth/me`; Sign out clears it. The auth API exposes `POST /api/auth/register`, `POST /api/auth/login` and `GET /api/auth/me`. Passwords use Argon2id and access tokens expire after 30 minutes by default. No project/map/analytics functionality is implemented yet.
 
 ## Checks
 
@@ -103,6 +106,7 @@ Open `http://127.0.0.1:5173`. Dashboard, Projects and Map explorer are intention
 npm run lint
 npm run build
 npm run format:check
+npm run test:auth # Requires API, frontend and installed Google Chrome
 backend/.venv/Scripts/ruff.exe check backend
 backend/.venv/Scripts/ruff.exe format --check backend
 Push-Location backend
@@ -114,6 +118,6 @@ Pop-Location
 
 ## Architecture and delivery
 
-The modular monolith separates presentation, API communication, routes, schemas, services, repositories and persistence. See [architecture](docs/architecture.md), [requirements](docs/requirements.md), [module plan](docs/module-plan.md), [Module 01 validation](docs/module-01-validation.md), and [Module 02 validation](docs/module-02-validation.md).
+The modular monolith separates presentation, API communication, routes, schemas, services, repositories and persistence. See [architecture](docs/architecture.md), [requirements](docs/requirements.md), [module plan](docs/module-plan.md), [Module 01 validation](docs/module-01-validation.md), [Module 02 validation](docs/module-02-validation.md), and [Module 03 validation](docs/module-03-validation.md).
 
 Future analytics will use explicitly labeled synthetic hackathon data, never misrepresented as satellite or scientific observations. Final delivery will include a private GitHub repository, a public application URL, reviewer instructions and a Word submission document in Module 12.
