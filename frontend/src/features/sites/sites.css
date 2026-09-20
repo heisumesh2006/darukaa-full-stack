@@ -1,0 +1,38 @@
+.site-section {
+  margin-top: 40px;
+}
+.site-section h2 {
+  font-weight: 500;
+}
+.site-list {
+  list-style: none;
+  padding: 0;
+}
+.site-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid #dfe6d8;
+}
+.site-list a {
+  overflow-wrap: anywhere;
+}
+.site-list span {
+  white-space: nowrap;
+  color: #526b59;
+}
+.site-form {
+  max-width: none;
+}
+.site-form fieldset:disabled .map-frame {
+  pointer-events: none;
+}
+.site-form .map-frame {
+  margin-top: 16px;
+}
+.site-area {
+  padding: 20px;
+  background: #e8f0df;
+  border-radius: 8px;
+}
