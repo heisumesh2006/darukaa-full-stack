@@ -12,7 +12,16 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "test:auth": "playwright test --config frontend/playwright.config.ts"
+    "test:auth": "playwright test --config frontend/playwright.config.ts auth.spec.ts",
+    "test:projects": "playwright test --config frontend/playwright.config.ts projects.spec.ts",
+    "test:map": "playwright test --config frontend/playwright.config.ts map.spec.ts",
+    "test:sites": "playwright test --config frontend/playwright.config.ts sites.spec.ts",
+    "test:analytics": "playwright test --config frontend/playwright.config.ts analytics.spec.ts",
+    "test:dashboard": "playwright test --config frontend/playwright.config.ts dashboard.spec.ts",
+    "test:e2e": "playwright test --config frontend/playwright.config.ts",
+    "test:discovery": "playwright test --config frontend/playwright.config.ts discovery.spec.ts",
+    "test:resilience": "playwright test --config frontend/playwright.config.ts resilience.spec.ts",
+    "typecheck:tests": "tsc -p frontend/tsconfig.tests.json"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

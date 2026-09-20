@@ -2,8 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.errors import install_error_handlers
+from app.api.routes.analytics import router as analytics_router
 from app.api.routes.auth import router as auth_router
+from app.api.routes.dashboard import router as dashboard_router
 from app.api.routes.health import router as health_router
+from app.api.routes.projects import router as projects_router
+from app.api.routes.sites import router as sites_router
 from app.core.config import get_settings
 
 
@@ -19,6 +23,10 @@ def create_app() -> FastAPI:
     )
     application.include_router(health_router, prefix="/api")
     application.include_router(auth_router, prefix="/api")
+    application.include_router(projects_router, prefix="/api")
+    application.include_router(sites_router, prefix="/api")
+    application.include_router(analytics_router, prefix="/api")
+    application.include_router(dashboard_router, prefix="/api")
     return application
 
 

@@ -79,3 +79,35 @@ def db_session(db_engine: Engine) -> Iterator[Session]:
             finally:
                 session.close()
                 transaction.rollback()
+
+
+@pytest.fixture
+def api_client(db_session):
+    from fastapi.testclient import TestClient
+
+    from app.api.dependencies import get_db
+    from app.main import create_app
+
+    app = create_app()
+    app.dependency_overrides[get_db] = lambda: db_session
+    with TestClient(app) as client:
+        yield client
+
+
+@pytest.fixture
+def owned_projects(api_client):
+    import secrets
+
+    result = []
+    for email in ("geo-owner@example.com", "geo-other@example.com"):
+        account = api_client.post(
+            "/api/auth/register", json={"email": email, "password": secrets.token_urlsafe(24)}
+        )
+        assert account.status_code == 201
+        headers = {"Authorization": f"Bearer {account.json()['access_token']}"}
+        project = api_client.post(
+            "/api/projects", headers=headers, json={"name": "Synthetic test project"}
+        )
+        assert project.status_code == 201
+        result.append((headers, project.json()["id"]))
+    return result

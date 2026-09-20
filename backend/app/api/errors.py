@@ -4,9 +4,26 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.services.auth_service import EmailAlreadyRegistered, InvalidCredentials
+from app.services.project_service import ProjectNotFound
+from app.services.site_service import InvalidBoundary, SiteNotFound
 
 
 def install_error_handlers(app: FastAPI) -> None:
+    @app.exception_handler(SiteNotFound)
+    async def site_not_found(_request: Request, _exc: SiteNotFound):
+        return JSONResponse(status_code=404, content={"detail": "Site not found"})
+
+    @app.exception_handler(InvalidBoundary)
+    async def invalid_boundary(_request: Request, _exc: InvalidBoundary):
+        return JSONResponse(
+            status_code=422,
+            content={"detail": "Boundary must be a valid Polygon with positive geodesic area"},
+        )
+
+    @app.exception_handler(ProjectNotFound)
+    async def project_not_found(_request: Request, _exc: ProjectNotFound):
+        return JSONResponse(status_code=404, content={"detail": "Project not found"})
+
     @app.exception_handler(RequestValidationError)
     async def validation_error(_request: Request, exc: RequestValidationError):
         # FastAPI's default validation errors echo input. Never reflect submitted secrets.

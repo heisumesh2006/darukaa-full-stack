@@ -111,7 +111,9 @@ test('project map, draw/create, persisted area, select, edit boundary, remove an
     'false',
   )
   await page.getByLabel('Interactive environmental map').click()
-  await expect(page.getByRole('status')).toContainText('Selected:')
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Selected:' }),
+  ).toContainText('Selected:')
   await page
     .getByRole('link', { name: 'Synthetic square', exact: true })
     .first()

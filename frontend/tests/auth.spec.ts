@@ -85,7 +85,10 @@ test('registration, refresh, logout, login and protected navigation', async ({
     return results
   })
   expect(headerScopes).toEqual([true, false, false, false])
-  await page.getByRole('link', { name: 'Map explorer' }).click()
+  await page
+    .getByRole('navigation', { name: 'Main navigation' })
+    .getByRole('link', { name: 'Map explorer', exact: true })
+    .click()
   await expect(
     page.getByRole('heading', { name: 'Map', exact: true }),
   ).toBeVisible()

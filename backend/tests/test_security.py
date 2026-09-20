@@ -94,3 +94,21 @@ def test_auth_configuration_fails_closed():
     ):
         with pytest.raises(ValidationError):
             Settings(**overrides)
+
+
+@pytest.mark.parametrize("kind", ["future_iat", "future_nbf", "wrong_algorithm"])
+def test_tokens_with_future_validity_or_unapproved_algorithm_are_rejected(kind):
+    settings = get_settings()
+    now = datetime.now(timezone.utc)
+    payload = {"sub": str(uuid4()), "iat": now, "exp": now + timedelta(hours=2)}
+    if kind == "future_iat":
+        payload["iat"] = now + timedelta(hours=1)
+    if kind == "future_nbf":
+        payload["nbf"] = now + timedelta(hours=1)
+    token = jwt.encode(
+        payload,
+        settings.jwt_secret_key.get_secret_value(),
+        algorithm="HS384" if kind == "wrong_algorithm" else "HS256",
+    )
+    with pytest.raises(jwt.InvalidTokenError):
+        decode_access_token(token, settings)
