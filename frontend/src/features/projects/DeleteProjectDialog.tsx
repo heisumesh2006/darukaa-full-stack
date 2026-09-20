@@ -56,13 +56,19 @@ export function DeleteProjectDialog({
       )}
       <div className="project-actions">
         <button
+          type="button"
           className="secondary-button"
           onClick={onClose}
           disabled={pending}
         >
           Cancel
         </button>
-        <button className="danger-button" onClick={confirm} disabled={pending}>
+        <button
+          type="button"
+          className="danger-button"
+          onClick={confirm}
+          disabled={pending}
+        >
           {pending ? 'Deleting…' : 'Delete permanently'}
         </button>
       </div>

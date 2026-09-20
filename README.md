@@ -4,11 +4,11 @@ An environmental project management and geospatial analytics platform for admini
 
 ## Current status
 
-Modules 01–03 provide developer tooling, protected placeholder Dashboard/Projects/Map routes, a FastAPI health endpoint, a migrated PostgreSQL/PostGIS schema with synthetic seed data, and JWT authentication. Registration, login, current-user lookup and browser logout are implemented. Project/site management APIs/UI, maps, analytics and deployment remain **planned, not implemented**. Seed values are synthetic hackathon examples; the inactive demo user still has no login credentials.
+Modules 01–10 provide developer tooling, JWT authentication, owner-scoped project/site management, Mapbox polygon drawing, site analytics with Highcharts, a portfolio dashboard, project/site search and filtering, map discovery, and expanded automated regression checks. Modules 11–12, including deployment, remain future work. Analytics values are synthetic hackathon examples; the inactive demo user still has no login credentials. See [site management](docs/module-06-sites.md), [analytics and opt-in demo metrics](docs/module-07-analytics.md), [dashboard calculations](docs/module-08-dashboard.md), [search and navigation](docs/module-09-search-ux.md), and [testing](docs/module-10-testing.md).
 
 ## Stack and structure
 
-React, Vite, TypeScript, React Router and Axios; Mapbox GL JS/Draw and Highcharts installed for later modules. Python/FastAPI, Pydantic Settings, SQLAlchemy 2, GeoAlchemy2 and Alembic; PostgreSQL 17 with PostGIS 3.5. ESLint, Prettier, Husky, lint-staged, Ruff and Pytest provide quality checks.
+React, Vite, TypeScript, React Router, Axios, Mapbox GL JS/Draw and Highcharts. Python/FastAPI, Pydantic Settings, SQLAlchemy 2, GeoAlchemy2 and Alembic; PostgreSQL 17 with PostGIS 3.5. ESLint, Prettier, Husky, lint-staged, Ruff and Pytest provide quality checks.
 
 ```text
 darukaa-earth/
@@ -55,14 +55,14 @@ POSTGRES_DB=darukaa_earth
 POSTGRES_PORT=5432
 DATABASE_URL=postgresql+psycopg://darukaa:<URL-encoded-password>@127.0.0.1:5432/darukaa_earth
 VITE_API_BASE_URL=http://localhost:8000/api
-VITE_MAPBOX_TOKEN=
+VITE_MAPBOX_ACCESS_TOKEN=
 CORS_ORIGINS=["http://localhost:5173","http://127.0.0.1:5173"]
 JWT_SECRET_KEY=<generated-random-secret-at-least-32-characters>
 JWT_ALGORITHM=HS256
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
-`.env` is ignored by Git. Never commit credentials. Vite exposes `VITE_*` values to the browser: the later Mapbox integration must use a public, URL-restricted Mapbox token, never a secret token. Leave it empty until Module 05. Backend settings and Vite both read the root `.env`; restart servers after editing. CORS origins use a JSON array. JWT configuration is required for API startup; use a randomly generated signing secret, never a literal placeholder or VITE-prefixed secret. The developer environment is already configured. See [authentication setup and tradeoffs](docs/module-03-authentication.md).
+`.env` is ignored by Git. Never commit credentials. Vite exposes `VITE_*` values to the browser: Mapbox must use a public browser token with appropriate URL restrictions, never a secret server token. Without a token the map shows a safe setup state. The old `VITE_MAPBOX_TOKEN` remains a compatibility fallback; prefer `VITE_MAPBOX_ACCESS_TOKEN`. Backend settings and Vite both read the root `.env`; restart servers after editing. CORS origins use a JSON array. JWT configuration is required for API startup; use a randomly generated signing secret, never a literal placeholder or VITE-prefixed secret. The developer environment is already configured. See [authentication setup and tradeoffs](docs/module-03-authentication.md) and [Mapbox configuration](docs/module-05-mapbox.md).
 
 ## PostgreSQL/PostGIS
 
@@ -98,7 +98,7 @@ In another terminal at the repository root:
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173/login` or `/register`. Registration signs you in; `/dashboard`, `/projects` and `/map` remain protected placeholders. Refresh restores the current tab's session through `/api/auth/me`; Sign out clears it. The auth API exposes `POST /api/auth/register`, `POST /api/auth/login` and `GET /api/auth/me`. Passwords use Argon2id and access tokens expire after 30 minutes by default. No project/map/analytics functionality is implemented yet.
+Open `http://127.0.0.1:5173/login` or `/register`. Registration signs you in; `/dashboard` summarizes your persisted portfolio and `/projects` manages your projects. Project details contain site lists/maps and links to draw/edit boundaries and view site analytics. `/map` provides an India-focused spatial workspace when a public token is configured. Refresh restores the current tab's session through `/api/auth/me`; Sign out clears it. The auth API exposes `POST /api/auth/register`, `POST /api/auth/login` and `GET /api/auth/me`. Passwords use Argon2id and access tokens expire after 30 minutes by default. See [project management](docs/module-04-projects.md) for ownership rules and permanent deletion behavior.
 
 ## Checks
 
@@ -107,6 +107,15 @@ npm run lint
 npm run build
 npm run format:check
 npm run test:auth # Requires API, frontend and installed Google Chrome
+npm run test:projects # Project CRUD and recoverable UI errors
+npm run test:map # Token-free map routing/lifecycle/error tests
+npm run test:sites # Drawing adapter + real site API/PostGIS flow
+npm run test:analytics # Synthetic seed, summaries and charts
+npm run test:dashboard # Portfolio KPIs and navigation
+npm run test:e2e # All browser tests
+npm run test:discovery # Project/site filters and map navigation
+npm run test:resilience # Loading, retry, session expiry and deletion recovery
+npm run typecheck:tests # Type-check browser tests and application source
 backend/.venv/Scripts/ruff.exe check backend
 backend/.venv/Scripts/ruff.exe format --check backend
 Push-Location backend
@@ -118,6 +127,6 @@ Pop-Location
 
 ## Architecture and delivery
 
-The modular monolith separates presentation, API communication, routes, schemas, services, repositories and persistence. See [architecture](docs/architecture.md), [requirements](docs/requirements.md), [module plan](docs/module-plan.md), [Module 01 validation](docs/module-01-validation.md), [Module 02 validation](docs/module-02-validation.md), and [Module 03 validation](docs/module-03-validation.md).
+The modular monolith separates presentation, API communication, routes, schemas, services, repositories and persistence. See [architecture](docs/architecture.md), [requirements](docs/requirements.md), [module plan](docs/module-plan.md), [Module 01 validation](docs/module-01-validation.md), [Module 02 validation](docs/module-02-validation.md), [Module 03 validation](docs/module-03-validation.md), [Module 04 validation](docs/module-04-validation.md), and [Module 05 validation](docs/module-05-validation.md).
 
 Future analytics will use explicitly labeled synthetic hackathon data, never misrepresented as satellite or scientific observations. Final delivery will include a private GitHub repository, a public application URL, reviewer instructions and a Word submission document in Module 12.

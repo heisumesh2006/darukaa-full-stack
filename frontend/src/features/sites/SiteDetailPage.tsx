@@ -44,7 +44,12 @@ function SiteDetail({
     )
   return (
     <section>
-      <Link to={`/projects/${projectId}`}>Back to project</Link>
+      <div className="page-links">
+        <Link to={`/projects/${projectId}`}>Back to project</Link>
+        <Link to={`/map?project=${projectId}`}>Explore project sites</Link>
+        <a href="#site-analytics">Jump to analytics</a>
+        <Link to="/dashboard">Portfolio overview</Link>
+      </div>
       <div className="project-heading">
         <h1>{site.name}</h1>
         <div className="project-actions">
@@ -54,7 +59,11 @@ function SiteDetail({
           >
             Edit site
           </Link>
-          <button className="danger-button" onClick={() => setDeleting(true)}>
+          <button
+            type="button"
+            className="danger-button"
+            onClick={() => setDeleting(true)}
+          >
             Delete site
           </button>
         </div>
@@ -72,9 +81,11 @@ function SiteDetail({
         </strong>
       </p>
       <SiteMap sites={[site]} />
-      <Suspense fallback={<Loading message="Opening analytics…" />}>
-        <SiteAnalytics projectId={projectId} siteId={siteId} />
-      </Suspense>
+      <div id="site-analytics" tabIndex={-1}>
+        <Suspense fallback={<Loading message="Opening analytics…" />}>
+          <SiteAnalytics projectId={projectId} siteId={siteId} />
+        </Suspense>
+      </div>
       {deleting && (
         <DeleteSiteDialog site={site} onClose={() => setDeleting(false)} />
       )}
@@ -123,10 +134,15 @@ function DeleteSiteDialog({
       <p>{site.name} and all its metric records will be permanently deleted.</p>
       {error && <p role="alert">Unable to delete site. Please retry.</p>}
       <div className="project-actions">
-        <button disabled={pending} onClick={onClose}>
+        <button type="button" disabled={pending} onClick={onClose}>
           Cancel
         </button>
-        <button disabled={pending} className="danger-button" onClick={confirm}>
+        <button
+          type="button"
+          disabled={pending}
+          className="danger-button"
+          onClick={confirm}
+        >
           {pending ? 'Deleting…' : 'Delete permanently'}
         </button>
       </div>

@@ -30,7 +30,7 @@ export function AppShell() {
             <span className="account-name">
               {user?.full_name || user?.email}
             </span>
-            <button className="logout-button" onClick={logout}>
+            <button type="button" className="logout-button" onClick={logout}>
               Sign out
             </button>
           </div>

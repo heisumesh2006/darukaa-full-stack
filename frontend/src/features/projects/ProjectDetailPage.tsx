@@ -40,13 +40,20 @@ function ProjectDetail({ projectId }: { projectId: string }) {
           <h1>{project.name}</h1>
         </div>
         <div className="project-actions">
+          <Link className="secondary-button" to={`/map?project=${project.id}`}>
+            Explore project sites
+          </Link>
           <Link
             className="secondary-button"
             to={`/projects/${project.id}/edit`}
           >
             Edit project
           </Link>
-          <button className="danger-button" onClick={() => setDeleting(true)}>
+          <button
+            type="button"
+            className="danger-button"
+            onClick={() => setDeleting(true)}
+          >
             Delete project
           </button>
         </div>

@@ -283,3 +283,18 @@ footer {
     font-size: 22px;
   }
 }
+
+main > section,
+.project-heading > div,
+.project-card,
+.dashboard-panel {
+  min-width: 0;
+}
+h1,
+h2,
+h3 {
+  overflow-wrap: anywhere;
+}
+.project-card-actions {
+  flex-wrap: wrap;
+}

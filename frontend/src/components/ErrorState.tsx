@@ -11,7 +11,11 @@ export function ErrorState({
     <div role="alert" className="feedback">
       <h2>{title}</h2>
       <p>{message}</p>
-      {onRetry && <button onClick={onRetry}>Try again</button>}
+      {onRetry && (
+        <button type="button" onClick={onRetry}>
+          Try again
+        </button>
+      )}
     </div>
   )
 }

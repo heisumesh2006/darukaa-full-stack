@@ -1,10 +1,42 @@
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Link, Navigate, Outlet } from 'react-router-dom'
+import { Loading } from '../components/Loading'
+const SiteFormPage = lazy(() =>
+  import('../features/sites/SiteFormPage').then((module) => ({
+    default: module.SiteFormPage,
+  })),
+)
+const SiteDetailPage = lazy(() =>
+  import('../features/sites/SiteDetailPage').then((module) => ({
+    default: module.SiteDetailPage,
+  })),
+)
 import { AppShell } from './AppShell'
-import { PlaceholderPage } from '../components/PlaceholderPage'
 import { ErrorState } from '../components/ErrorState'
 import { AuthProvider } from '../features/auth/AuthProvider'
 import { AuthPage } from '../features/auth/AuthPage'
 import { ProtectedRoute } from '../features/auth/ProtectedRoute'
+import { ProjectsPage } from '../features/projects/ProjectsPage'
+const ProjectDetailPage = lazy(() =>
+  import('../features/projects/ProjectDetailPage').then((module) => ({
+    default: module.ProjectDetailPage,
+  })),
+)
+import {
+  CreateProjectPage,
+  EditProjectPage,
+} from '../features/projects/ProjectFormPage'
+
+const MapPage = lazy(() =>
+  import('../features/map/MapPage').then((module) => ({
+    default: module.MapPage,
+  })),
+)
+const DashboardPage = lazy(() =>
+  import('../features/dashboard/DashboardPage').then((module) => ({
+    default: module.DashboardPage,
+  })),
+)
 
 export const router = createBrowserRouter([
   {
@@ -35,31 +67,60 @@ export const router = createBrowserRouter([
               {
                 path: 'dashboard',
                 element: (
-                  <PlaceholderPage
-                    title="Dashboard"
-                    module="08"
-                    description="Your environmental portfolio, in perspective."
-                  />
+                  <Suspense fallback={<Loading message="Opening dashboard…" />}>
+                    <DashboardPage />
+                  </Suspense>
                 ),
               },
               {
                 path: 'projects',
+                element: <ProjectsPage />,
+              },
+              { path: 'projects/new', element: <CreateProjectPage /> },
+              {
+                path: 'projects/:projectId/sites/new',
                 element: (
-                  <PlaceholderPage
-                    title="Projects"
-                    module="04"
-                    description="A home for your carbon and biodiversity projects."
-                  />
+                  <Suspense fallback={<Loading message="Opening workspace…" />}>
+                    <SiteFormPage />
+                  </Suspense>
                 ),
+              },
+              {
+                path: 'projects/:projectId/sites/:siteId',
+                element: (
+                  <Suspense fallback={<Loading message="Opening workspace…" />}>
+                    <SiteDetailPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: 'projects/:projectId/sites/:siteId/edit',
+                element: (
+                  <Suspense fallback={<Loading message="Opening workspace…" />}>
+                    <SiteFormPage editing />
+                  </Suspense>
+                ),
+              },
+              {
+                path: 'projects/:projectId',
+                element: (
+                  <Suspense fallback={<Loading message="Opening workspace…" />}>
+                    <ProjectDetailPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: 'projects/:projectId/edit',
+                element: <EditProjectPage />,
               },
               {
                 path: 'map',
                 element: (
-                  <PlaceholderPage
-                    title="Map"
-                    module="05"
-                    description="Explore the places behind your environmental projects."
-                  />
+                  <Suspense
+                    fallback={<Loading message="Opening map workspace…" />}
+                  >
+                    <MapPage />
+                  </Suspense>
                 ),
               },
               {

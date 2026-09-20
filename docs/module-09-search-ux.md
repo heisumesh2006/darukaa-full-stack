@@ -1,0 +1,11 @@
+# Module 09 — Search, filtering and navigation
+
+Project discovery searches names and descriptions using a trimmed, case-insensitive literal substring, combined with draft/active/archived status. Site discovery uses the same text semantics and database-generated area bands: under 100 hectares or 100 hectares and above. Null descriptions are treated as empty text. Filters operate on the existing complete owner-scoped API lists; there are no new endpoints, schema changes, dependencies, or server-side authorization changes. This is appropriate for the current small portfolio; server pagination/search is a future scale concern.
+
+Project filters use `q`/`status` URL parameters. Site filters use `siteq`/`area`. Reload and browser back preserve filters; typing replaces history entries. Unsupported filter values behave as All. Clear filters preserves unrelated parameters, including the map's selected project. Empty portfolios and empty filtered results have different messages; counts are announced politely and fields have visible labels.
+
+The map explorer selects an owned project with `project=<uuid>`, then reuses the site's list, filters and map. It requests only the selected project's sites rather than every project's geometry. Changing project resets site filters and selection. Unknown or unavailable projects show a safe message. List selection locates a boundary; clicking a visible polygon provides a site detail link. Text/area filtering updates map features and hides selections outside the results. The accessible site list remains usable without a Mapbox token.
+
+Project details link to map discovery. Site detail links connect the parent project, project map, analytics anchor and portfolio dashboard. Project details, site details and boundary forms now load lazily, alongside the existing lazy Mapbox/dashboard/analytics code. Shared feedback, dialogs and other action buttons explicitly use `type="button"`; submit buttons retain their behavior. Responsive controls wrap, long titles break safely, and mobile discovery tests assert no horizontal document overflow.
+
+Existing Mapbox/Draw adapters, auth, CRUD, persisted geometry/area, synthetic analytics and dashboard calculations are preserved. Real provider rendering and pointer gestures still require manual review with a valid public Mapbox token.

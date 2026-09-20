@@ -7,9 +7,11 @@ import type { Site } from './types'
 export function SiteMap({
   sites,
   onSelect,
+  selectedId,
 }: {
   sites: Site[]
   onSelect?: (id: string) => void
+  selectedId?: string
 }) {
   const [map, setMap] = useState<Map | null>(null)
   const ready = useCallback((instance: Map) => {
@@ -53,5 +55,11 @@ export function SiteMap({
       }
     }
   }, [map, sites, onSelect])
+  useEffect(() => {
+    const site = sites.find((item) => item.id === selectedId)
+    if (!map || !site) return
+    const bounds = polygonBounds([site.geometry])
+    if (bounds) map.fitBounds(bounds, { padding: 50, maxZoom: 14, duration: 0 })
+  }, [map, sites, selectedId])
   return <MapView onReady={ready} />
 }

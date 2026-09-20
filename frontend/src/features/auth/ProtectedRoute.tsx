@@ -15,7 +15,7 @@ export function ProtectedRoute() {
           message={auth.sessionError}
           onRetry={auth.retrySession}
         />
-        <button className="session-signout" onClick={auth.logout}>
+        <button type="button" className="session-signout" onClick={auth.logout}>
           Sign out
         </button>
       </div>

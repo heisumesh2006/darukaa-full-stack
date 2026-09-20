@@ -6,10 +6,26 @@ import { DeleteProjectDialog } from './DeleteProjectDialog'
 import { useProjects } from './hooks'
 import type { Project } from './types'
 import './projects.css'
+import { DiscoveryFilters } from '../../components/DiscoveryFilters'
+import {
+  matchesText,
+  useDiscoveryFilters,
+} from '../../hooks/useDiscoveryFilters'
 
 export function ProjectsPage() {
   const { data: projects, error, loading, reload } = useProjects()
   const [selected, setSelected] = useState<Project | null>(null)
+  const filters = useDiscoveryFilters('q', 'status', [
+    'draft',
+    'active',
+    'archived',
+  ])
+  const visible =
+    projects?.filter(
+      (project) =>
+        matchesText(project, filters.query) &&
+        (!filters.filter || project.status === filters.filter),
+    ) || []
   const location = useLocation()
   const [notice, setNotice] = useState<string | null>(
     location.state?.notice || null,
@@ -55,40 +71,60 @@ export function ProjectsPage() {
         </div>
       )}
       {projects && projects.length > 0 && (
-        <div className="project-grid">
-          {projects.map((project) => (
-            <article className="surface project-card" key={project.id}>
-              <span className={`project-status ${project.status}`}>
-                {project.status}
-              </span>
-              <h2>
-                <Link to={`/projects/${project.id}`}>{project.name}</Link>
-              </h2>
-              <p className="project-summary">
-                {project.description || 'No description added yet.'}
-              </p>
-              <p className="project-date">
-                Updated {new Date(project.updated_at).toLocaleDateString()}
-              </p>
-              <div className="project-card-actions">
-                <Link to={`/projects/${project.id}`}>View project</Link>
-                <Link
-                  to={`/projects/${project.id}/edit`}
-                  aria-label={`Edit ${project.name}`}
-                >
-                  Edit
-                </Link>
-                <button
-                  className="text-danger"
-                  aria-label={`Delete ${project.name}`}
-                  onClick={() => setSelected(project)}
-                >
-                  Delete
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
+        <>
+          <DiscoveryFilters
+            noun="Projects"
+            label="Project status"
+            options={['draft', 'active', 'archived'].map((value) => ({
+              value,
+              label: value[0].toUpperCase() + value.slice(1),
+            }))}
+            {...filters}
+            count={visible.length}
+            total={projects.length}
+          />
+          {!visible.length && (
+            <div className="surface project-empty">
+              <h2>No matching projects</h2>
+              <p>Try another name or description, or clear the filters.</p>
+            </div>
+          )}
+          <div className="project-grid">
+            {visible.map((project) => (
+              <article className="surface project-card" key={project.id}>
+                <span className={`project-status ${project.status}`}>
+                  {project.status}
+                </span>
+                <h2>
+                  <Link to={`/projects/${project.id}`}>{project.name}</Link>
+                </h2>
+                <p className="project-summary">
+                  {project.description || 'No description added yet.'}
+                </p>
+                <p className="project-date">
+                  Updated {new Date(project.updated_at).toLocaleDateString()}
+                </p>
+                <div className="project-card-actions">
+                  <Link to={`/projects/${project.id}`}>View project</Link>
+                  <Link
+                    to={`/projects/${project.id}/edit`}
+                    aria-label={`Edit ${project.name}`}
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    type="button"
+                    className="text-danger"
+                    aria-label={`Delete ${project.name}`}
+                    onClick={() => setSelected(project)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </>
       )}
       {selected && (
         <DeleteProjectDialog
